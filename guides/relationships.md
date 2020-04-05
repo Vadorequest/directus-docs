@@ -150,32 +150,66 @@ This type of relationship goes by many different names, and is often referred to
 
 The translation interface is a standard O2M relation, but it requires an additional field in the related collection to hold the language key. Let's take a look at some example collections and fields for "Articles":
 
+### Videos
+
+Here are 2 short step-by-step video in case you get stuck. They use a different (but very similar) data structure.
+1. Part 1 - [https://youtu.be/9v0uQuhtuNc](https://youtu.be/9v0uQuhtuNc)
+1. Part 2 - [https://youtu.be/_RMUNwMAGEM](https://youtu.be/_RMUNwMAGEM)
+
+### Final structure
+
 * `articles` — The parent collection
-  * `id` — The article's primary key
-  * `publish_date` — Example agnostic field
-  * `translations` — This is the ALIAS field (not an actual column) we're setting-up
+  * `id` — The article's primary key(**relationship**)
+  * <small>`publish_date` — Example language agnostic field</small>
+  * <small>`created_on` — Example language agnostic field</small>
+  * `translations` — This is the ALIAS field (not an actual column) we're setting-up (**relationship**)
 * `article_translations` — The translations collection
   * `id` — The translation's primary key
-  * `article` — Stores the article's primary key: `article.id`
-  * `language` — Stores the language key, eg: `en-US`
-  * `title` — Example translated field
-  * `body` — Example translated field
+  * `article` — Stores the article's primary key: `article.id` (**relationship**)
+  * `language` — Stores the language key (eg: `en-US`, `fr`) (**special field**)
+  * <small>`title` — Example translated field</small>
+  * <small>`body` — Example translated field</small>
 
-### The Parent Collection
+The `articles` collection will contain:
+- a primary key (`id`) 
+- an alias field linked to the `article_translations` collection 
+- multiple language-agnostic (non-translated) fields, such as: _Publish Date_, _Created On, etc.
 
-In this example, the parent collection stores articles, so we've called it `articles`. It contains a primary key, as well as any language-agnostic (non-translated) fields, such as: _Publish Date_, _Author_, or a _Featured Toggle_. We also add the "translation field" (actually an ALIAS) to this collection... which is what we're learning to set up here.
+::: warning Warning
+The `articles` collection will not contain any translated field! All fields that may be translated should belong to the `article_translations` collection!
+:::
 
-### The Translations Collection
+The `article_translations` collection will contain: 
+- a primary key (`id`)
+- a foreign key (`article`) linked to `articles.id`
+- a `language`, which is a special field (string)
+- multiple translated fields, such as: _title_ and _body_ (Text Input, Text Area, Wysiwyg, etc.)
 
-We also need to create a related collection to store any fields that will be translated, such as the _Title_ and _Body_. We'll call this `article_translations`. Below we describe the required fields for this collection.
+::: warning Warning
+It's easier to follow the below tutorial than trying to re-create this structure by yourself :wink:
+:::
 
-* **Parent Foreign Key** — This is the field that stores the parent item's primary key. So in our example we would add an `article` field to store the article's ID. Typically we'd use a "Numeric" interface with a `integer` type, and set it to "Hide on Detail".
-* **Language Foreign Key** — This is the field that stores the language code. We recommend calling this field `language`. Typically we'd use a "Text Input" interface with a `lang` type, and set it to "Hide on Detail".
+### Step-by-step tutorial
+
+#### 1. The Parent Collection
+
+Create the `articles` collection. Additional fields (e.g: `created_on`, `sort`) depend on your use-case, it's up to you. 
+
+#### 2. The Translations Collection
+
+We also need to create a related collection to store any fields that will be translated, such as the _Title_ and _Body_. 
+We'll call this `article_translations`. Below we describe the required fields for this collection.
+
+* **Parent Foreign Key** — This is the field that stores the parent item's primary key. So in our example we would add an `article` field to store the article's ID. 
+    - Typically we'd use a **`Numeric interface`** with a `integer` type (**not** a `Primary key`).
+    - Set it to "Hide on Detail" and "Hide on Browse".
+* **Language Foreign Key** — This is the field that stores the language code. 
+    - We recommend calling this field `language`. Typically we'd use a "**Language**" interface, and set it to "Hide on Detail".
 * **One or More Translated Fields** — Now just add any fields that you would like to use for translated content. In our "Articles" example this might be a `title` field as a Text Input, a `body` field as a WYSIWYG, or anything else you want translated.
 
-### The Translation Field Setup
+#### 3. The Translation Field Setup
 
-Once you've set up both the parent and translation collections (eg: `articles` and `article_translations`), you can follow these steps to setup the translations interface.
+Once you've set up both the parent and translation collections (e.g: `articles` and `article_translations`), you can follow these steps to setup the translations interface.
 
 ::: v-pre
 1. Go to **Settings > Collections & Fields > Articles**
@@ -186,7 +220,7 @@ Once you've set up both the parent and translation collections (eg: `articles` a
     * Select **Article Translations** as the Related Collection
     * Select **Article** as the Related Field
 12. Options:
-    * **Language Field** is the name of the field within the Translation Collection (eg: "language")
-    * **Languages** is where you set the languages that can be translated. The key should be a language code (eg: `en-US`), and the name should be the human readable version (eg: `English`). You can add as many languages as you'd like.
+    * **Language Field** is the name of the field within the Translation Collection (e.g: "language")
+    * **Languages** is where you set the languages that can be translated. The key should be a language code (e.g: `en-US`, `fr`), and the name should be the human readable version (e.g: `English`). You can add as many languages as you'd like.
     * **Display Template** is a string format for how to display the value on item listing pages and layouts. This should include templated fields from the Translations Collection, such as: `{{title}} — {{summary}}`.
 :::
